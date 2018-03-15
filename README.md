@@ -4,4 +4,4 @@ The tool is made with RevitPythonShell and Winforms.
 
 An installer can be found [here](https://github.com/C-Claus/AssemblyCodeFilter/blob/master/setup.exe)
 
-A demonstration of the tool can be found on Youtube: https://youtu.be/P26hZL5vg1k
+A demonstration of the tool can be found on [Youtube](https://youtu.be/P26hZL5vg1k)
