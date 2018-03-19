@@ -29,8 +29,9 @@ from random import random
 from random import randint
 from math import *
 from collections import OrderedDict
+import ctypes
 
-#icon_path = "U:\\09. Python scripts\\assembly_code_filter\\icon_nlsfb.ico"
+
 clr.AddReference("System.Windows.Forms")
 clr.AddReference("System.Drawing")
 clr.AddReference("RevitAPI") 
@@ -127,7 +128,7 @@ for i in categories_list:
     
     
 ######################################################################################################
-################################Sort Assembly Code List###############################################
+#####################################Sort Assembly Code List##########################################
 ######################################################################################################
 ac_list    = []    
 
@@ -140,7 +141,7 @@ sorted_ac_list = sorted(ac_list)
 
 
 ######################################################################################################
-#########################Graphical User Interface Class###############################################
+################################Graphical User Interface Class########################################
 ######################################################################################################
 width = 500
 height = 990
@@ -154,10 +155,9 @@ class AssemblyFilter(Form):
         self.BorderStyle = BorderStyle.Fixed3D
         self.Width = width
         self.Height = height
-        self.Text = "Assembly Code Filter | Version 0.1"
+        self.Text = "Assembly Code Filter | Version 1.1"
         self.MaximizeBox = False
         self.FormBorderStyle = FormBorderStyle.FixedDialog
-        #self.Icon = Icon(icon_path)
         
         self.Controls.Add(self.header(0,0))
         self.Controls.Add(self.panel(0,80))
@@ -185,6 +185,13 @@ class AssemblyFilter(Form):
         self.sublabel_objects.Font = Font("Calibri Light", 12) 
         self.sublabel_objects.ForeColor = Color.White
         
+        self.sublabel_no_selection = Label()
+        self.sublabel_no_selection.Text = ""
+        self.sublabel_no_selection.Location = Point(x+40, y+50)
+        self.sublabel_no_selection.Width = width-200
+        self.sublabel_no_selection.Font = Font("Calibri Light", 12, style)
+        self.sublabel_no_selection.ForeColor = Color.White 
+        
         self.header = Panel()
         self.header.Width = width
         self.header.Height = 80
@@ -195,6 +202,7 @@ class AssemblyFilter(Form):
 
         self.header.Controls.Add(self.sublabel)
         self.header.Controls.Add(self.sublabel_objects)
+        self.header.Controls.Add(self.sublabel_no_selection)
         self.header.AutoScroll = True
 
     
@@ -280,11 +288,12 @@ class AssemblyFilter(Form):
             if f.Text in self.selected_code_list:
                 self.selected_code_list.remove(f.Text)
                        
-        #print '_________________________________________________________________________________________'
 
                    
     def uncheck_checkboxes(self, sender, event):
-        #print 'Selection Cleared'
+
+        
+        self.sublabel_no_selection.Text = ""
         
         for f in self.check_value:
             f.Checked = False
@@ -305,6 +314,8 @@ class AssemblyFilter(Form):
         self.check_empty_assembly_code(selected_code=sender.Text) 
         
     def check_empty_assembly_code(self, selected_code):
+    
+        self.sublabel_no_selection.Text = ""
   
         ids = list()
 
@@ -315,9 +326,11 @@ class AssemblyFilter(Form):
                 element_instances.append(i.Id)
                 ids.append(i.Id)
                     
-        self.sublabel_objects.Text = "Number of Assembly Codes Selected: " + str(len(ids))
+        self.sublabel_objects.Text = "Number of Objects Current Selection: " + str(len(ids))
         assembly_codes_selected = '-'
-        self.sublabel.Text = "Number of Objects Current Selection: " + str(assembly_codes_selected)
+        self.sublabel.Text = "Number of Assembly Codes Selected: " + str(assembly_codes_selected)
+        
+  
 
         #Hide Reset Active View
         t = Transaction(doc, 'Reset HideIsolate')    
@@ -337,32 +350,37 @@ class AssemblyFilter(Form):
     def check_for_selected_code(self, selected_code):
     
         #print selected_code
-
-        self.sublabel.Text = "Number of Assembly Codes Selected: " + str(len(selected_code))
-
-        ids = list()
-
-        for i, v in id_assembly_dict.iteritems():
-            if len(v) > 1:
-                for code in selected_code:
-                    if v.startswith(code):
-                        ids.append(i.Id)
-                
-        self.sublabel_objects.Text = "Number of Objects Current Selection: " + str(len(ids))
+        if len(selected_code) == 0:
+        	
+        	self.sublabel_no_selection.Text = "Please select and Assembly Code First!"
         
-        #Hide Reset Active View    
-        t = Transaction(doc, 'Reset HideIsolate')    
-        t.Start()
-        view.TemporaryViewModes.DeactivateAllModes()
-        t.Commit()    
-        
-        idElements = List[ElementId](ids)
-        
-        #Hide Isolate Objects in Active View
-        t = Transaction(doc, 'Filter Elements')    
-        t.Start()    
-        view.IsolateElementsTemporary(idElements)
-        t.Commit()
+        if len(selected_code) > 0:
+
+	        self.sublabel.Text = "Number of Assembly Codes Selected: " + str(len(selected_code))
+	
+	        ids = list()
+	
+	        for i, v in id_assembly_dict.iteritems():
+	            if len(v) > 1:
+	                for code in selected_code:
+	                    if v.startswith(code):
+	                        ids.append(i.Id)
+	                
+	        self.sublabel_objects.Text = "Number of Objects Current Selection: " + str(len(ids))
+	        
+	        #Hide Reset Active View    
+	        t = Transaction(doc, 'Reset HideIsolate')    
+	        t.Start()
+	        view.TemporaryViewModes.DeactivateAllModes()
+	        t.Commit()    
+	        
+	        idElements = List[ElementId](ids)
+	        
+	        #Hide Isolate Objects in Active View
+	        t = Transaction(doc, 'Filter Elements')    
+	        t.Start()    
+	        view.IsolateElementsTemporary(idElements)
+	        t.Commit()
 
         
 
