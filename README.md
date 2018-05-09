@@ -12,4 +12,4 @@ A demonstration of the tool can be found on [Youtube](https://youtu.be/P26hZL5vg
 
 
 
-![picture](https://ibb.co/b0Qqr7)
+![picture](https://s7.postimg.cc/5tg40l1nv/GUI.png)
